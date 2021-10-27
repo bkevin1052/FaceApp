@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders,HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment.prod';
-import { throwError } from 'rxjs';
+import { throwError,Observable} from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Injectable({
@@ -12,15 +12,14 @@ export class AzureCognitiveServicesService {
   constructor(private httpClient: HttpClient) { }
 
 
-  GetImage(imageUrl:string){
+  GetImage(imageUrl:string):Observable<any>{
 
-    const options = {
-      headers: new HttpHeaders().append('Content-Type', 'application/json'),
-      //params: new HttpParams().append('Ocp-Apim-Subscription-Key', 'c3cc8c1342e8426abe38113a2d9ed60b')
-    }
-    console.log(options);
-    console.log(imageUrl);
-    return this.httpClient.post(`${environment.server}`, { url: imageUrl},options).pipe(catchError(this.clientError));
+    const header = new HttpHeaders({
+      'Content-Type':'application/json',
+      'Ocp-Apim-Subscription-Key': 'f70f66fc1a3e494f83258b69497b9a4d'
+    })
+
+    return this.httpClient.post(environment.server, {url: imageUrl},{headers:header}).pipe(catchError(this.clientError));
   }
 
   clientError(error: HttpErrorResponse) {

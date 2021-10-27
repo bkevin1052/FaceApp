@@ -21,7 +21,7 @@ export class AppComponent {
   getInfo(imageUrl:string){
       this.data.GetImage(imageUrl).subscribe(data => {
         console.log(data)
-        //this.ImageInfo = data;
+        this.ImageInfo = data;
       })
   }
 
