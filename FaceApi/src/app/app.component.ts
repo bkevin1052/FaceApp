@@ -1,5 +1,6 @@
 import { AzureCognitiveServicesService } from './services/azure-cognitive-services.service';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import axios from 'axios';
 
 @Component({
   selector: 'app-root',
@@ -57,6 +58,35 @@ export class AppComponent {
     this.drawImageToCanvas(this.video.nativeElement);
     this.captures.push(this.canvas.nativeElement.toDataURL("image/png"));
     this.isCaptured = true;
+
+    this.uploadToS3()
+  }
+
+  async uploadToS3() {
+
+    let response = await axios.post('https://ri3eoiwlti.execute-api.us-east-1.amazonaws.com/dev/file', {
+      key: new Date().getTime().toString().concat('.png'),
+      contentType: 'image/png'
+    })
+    
+    let resBody = JSON.parse(response.data.body)
+
+    console.log(resBody)
+    
+    let binary = atob(this.captures[0].split(',')[1])
+    let array = []
+    for (var i = 0; i < binary.length; i++) {
+      array.push(binary.charCodeAt(i))
+    }
+    let blobData = new Blob([new Uint8Array(array)], {type: 'image/png'})
+    console.log('Uploading to: ', resBody.uploadURL)
+
+    const result = await fetch(resBody.uploadURL, {
+      method: 'PUT',
+      body: blobData
+    })
+    console.log('Result: ', result)
+
   }
 
   removeCurrent() {
