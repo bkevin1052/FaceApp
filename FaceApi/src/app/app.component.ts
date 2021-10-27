@@ -26,6 +26,10 @@ export class AppComponent {
   error: any;
   isCaptured: boolean;
 
+  OnFileSelected(event: any){
+    console.log(event)
+  }
+
   async ngAfterViewInit() {
     await this.setupDevices();
   }
@@ -75,7 +79,7 @@ export class AppComponent {
   constructor(private data:AzureCognitiveServicesService){
     this.imageUrl = '';
     this.ImageInfo = '';
-    this.captures = [];;
+    this.captures = [];
   }
 
   getInfo(imageUrl:string){
