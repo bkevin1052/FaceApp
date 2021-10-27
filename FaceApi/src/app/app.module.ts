@@ -1,8 +1,10 @@
+import { AzureCognitiveServicesService } from './services/azure-cognitive-services.service';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -10,9 +12,13 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    BrowserModule
   ],
-  providers: [],
+  providers: [AzureCognitiveServicesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

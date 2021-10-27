@@ -1,3 +1,4 @@
+import { AzureCognitiveServicesService } from './services/azure-cognitive-services.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,5 +7,24 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'FaceApi';
+  title = 'Face Api';
+
+  imageUrl: string;
+
+  ImageInfo: string;
+
+  constructor(private data:AzureCognitiveServicesService){
+    this.imageUrl = '';
+    this.ImageInfo = '';
+  }
+
+  getInfo(imageUrl:string){
+      this.data.GetImage(imageUrl).subscribe(data => {
+        console.log(data)
+        //this.ImageInfo = data;
+      })
+  }
+
+
+
 }
