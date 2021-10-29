@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment.prod';
 import { throwError,Observable} from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,6 @@ import { catchError } from 'rxjs/operators';
 export class AzureCognitiveServicesService {
 
   constructor(private httpClient: HttpClient) { }
-
 
   GetImage(imageUrl:string):Observable<any>{
 
@@ -34,5 +33,4 @@ export class AzureCognitiveServicesService {
 
     return throwError(errorMessage);
   }
-
 }

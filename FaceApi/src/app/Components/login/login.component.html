@@ -1,0 +1,59 @@
+<div class="bg"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
+<div
+  class="card content"
+  style="width: 70%; margin-left: auto; margin-right: auto"
+>
+  <div class="card-body">
+    <form [formGroup]="form_login" class="form-signin">
+      <img
+        class="center"
+        src="https://raw.githubusercontent.com/bkevin1052/ZuperApp/master/ZuperApp/icons/ZuperApp.png"
+        style="width: 50%"
+      />
+      <br />
+      <label for="inputUsername" class="sr-only">Email</label>
+      <input
+        type="username"
+        formControlName="username"
+        id="Username"
+        class="form-control"
+        placeholder="Username"
+        required=""
+        autofocus=""
+      />
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input
+        type="password"
+        formControlName="password"
+        id="Password"
+        class="form-control"
+        placeholder="Password"
+        required=""
+      />
+      <br />
+      <button
+        id="bLogIn"
+        class="btn btn-warning btn-lg btn-block"
+        (click)="login()"
+      >
+        Log In
+      </button>
+      <hr />
+      <div class="center">
+        <button class="btn btn-danger btn-lg mr-1" (click)="SignInWithGoogle()">
+          <img
+            src="https://raw.githubusercontent.com/bkevin1052/ZuperApp/master/ZuperApp/icons/google.png"
+            style="width: 30px"
+          />
+        </button>
+      </div>
+      <hr />
+      <a routerLink="/register">Create an Account!</a>
+      <br />
+      <a routerLink="/forgotpassword">Forgot Password?</a>
+      <p style="text-align: center" class="mt-5 mb-3 text-muted">© 2021</p>
+    </form>
+  </div>
+</div>

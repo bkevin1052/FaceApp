@@ -1,1 +1,84 @@
 /* You can add global styles to this file, and also import other style files */
+
+.colorZuper {
+    color: #EE8700;
+}
+
+.thead-zuper {
+    background-color: rgb(111, 134, 221) !important;
+}
+
+.tr-zuper {
+  background-color: rgb(170, 186, 230) !important;
+  font-weight:bold;
+}
+
+.bg-zuper {
+    background-color: #ffffff;
+}
+
+.btn-info {
+    background-color:#EE8700 !important;
+    border: none !important;
+    color: black;
+}
+
+.btn_logout {
+    background-color: #EE8700;
+    border: none;
+    color: black;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    padding: 0;
+}
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.card-services {
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  text-align: center;
+}
+
+.tabla {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.card-title {
+    font-family: 'Prata' !important;
+    font-weight: bold !important;
+    font-size: 15px;
+}
+
+.contenedorImagenCircular {
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+}
+
+.imagen_circular {
+    display: inline;
+    /*margin: 0 auto;
+    margin-left: -25%;*/
+    height: 100%;
+    width: auto;
+}
+
+.border-info {
+    border-color: #5EF0E4 !important;
+}
+
+.titulo {
+    font-family: 'Prata' !important;
+    font-weight: bold !important;
+    font-size: 30px;
+    height: fit-content;
+}
