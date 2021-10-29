@@ -10,6 +10,7 @@ import { AuthService } from './Components/services/auth/auth.service';
 import { AuthGuard } from './Components/services/auth/auth.guard';
 import { HttpClientModule } from '@angular/common/http';
 import { SocialLoginModule,SocialAuthServiceConfig,GoogleLoginProvider,FacebookLoginProvider} from 'angularx-social-login';
+import { HomeComponent } from './Components/home/home.component';
 
 
 
@@ -17,7 +18,8 @@ import { SocialLoginModule,SocialAuthServiceConfig,GoogleLoginProvider,FacebookL
   declarations: [
     AppComponent,
     ForgotPasswordComponent,
-    RegisterComponent
+    RegisterComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
