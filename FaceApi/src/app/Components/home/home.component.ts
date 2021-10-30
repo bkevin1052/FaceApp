@@ -2,6 +2,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import axios from 'axios';
 import { AzureCognitiveServicesService } from '../services/AzureApi/azure-cognitive-services.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -182,9 +183,20 @@ export class HomeComponent implements OnInit {
        */
       await this.uploadToS3(blobData1)
       await this.uploadToS3(blobData2)
+
+      let info1 = this.getInfo(this.link1)
+      let info2 = this.getInfo(this.link2)
+    }
+    else if (this.link1 != null && this.link2 != null){
+      let info1 = this.getInfo(this.link1)
+      let info2 = this.getInfo(this.link2)
     }
     else {
-      
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Debes seleccionar dos imágenes o tomar dos fotografías!',
+      })
     }
   }
 
@@ -212,11 +224,9 @@ export class HomeComponent implements OnInit {
   }
 
   getInfo(imageUrl:string){
-      this.data.GetImage(imageUrl).subscribe(data => {
-        console.log(data)
-        this.ImageInfo = data;
-      })
+    this.data.GetImage(imageUrl).subscribe(data => {
+      console.log(data)
+      return data;
+    })
   }
-
-
 }
