@@ -10,14 +10,16 @@ import { AuthService } from './Components/services/auth/auth.service';
 import { AuthGuard } from './Components/services/auth/auth.guard';
 import { HttpClientModule } from '@angular/common/http';
 import { SocialLoginModule,SocialAuthServiceConfig,GoogleLoginProvider,FacebookLoginProvider} from 'angularx-social-login';
-
-
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { HomeComponent } from './Components/home/home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ForgotPasswordComponent,
-    RegisterComponent
+    RegisterComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -25,7 +27,9 @@ import { SocialLoginModule,SocialAuthServiceConfig,GoogleLoginProvider,FacebookL
     ReactiveFormsModule,
     LoginModule,
     HttpClientModule,
-    SocialLoginModule
+    SocialLoginModule,
+    FormsModule,
+    CommonModule
   ],
   providers: [{provide:AuthService}, {provide:AuthGuard},
       {

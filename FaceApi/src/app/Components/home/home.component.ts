@@ -11,8 +11,10 @@ import { AzureCognitiveServicesService } from '../services/AzureApi/azure-cognit
 export class HomeComponent implements OnInit {
 
   imageUrl: string;
-
   ImageInfo: string;
+
+  link1: string;
+  link2: string;
 
   WIDTH = 640;
   HEIGHT = 480;
@@ -31,12 +33,72 @@ export class HomeComponent implements OnInit {
 
   }
 
-  OnFileSelected(event: any){
+  OnFileSelected1(event: any){
     console.log(event)
+    const file:File = event.target.files[0];
+
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    let blobData1 = new Blob()
+
+    let that = this;
+
+    reader.onload = async function () {
+      let fileData = reader.result?.toString()
+
+      let binary = atob(fileData!.split(',')[1])
+      let array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      blobData1 = new Blob([new Uint8Array(array)], {type: 'image/png'})
+      
+      that.link1 = await that.uploadToS3(blobData1)
+    };
+  }
+
+  OnFileSelected2(event: any){
+    console.log(event)
+    const file:File = event.target.files[0];
+
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    let blobData1 = new Blob()
+
+    let that = this;
+
+    reader.onload = async function () {
+      let fileData = reader.result?.toString()
+
+      let binary = atob(fileData!.split(',')[1])
+      let array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      blobData1 = new Blob([new Uint8Array(array)], {type: 'image/png'})
+      
+      that.link2 = await that.uploadToS3(blobData1)
+    };
   }
 
   async ngAfterViewInit() {
     await this.setupDevices();
+  }
+
+  getBase64(file:File) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      console.log(reader.result)
+      return reader.result
+
+    };
+    reader.onerror = function (error) {
+      console.log('Error: ', error);
+      
+    };
   }
 
   async setupDevices() {
@@ -63,10 +125,14 @@ export class HomeComponent implements OnInit {
     this.captures.push(this.canvas.nativeElement.toDataURL("image/png"));
     this.isCaptured = true;
 
-    this.uploadToS3()
+    if (this.captures.length > 2) {
+      this.captures.shift()
+    }
+
+    console.log(this.captures);
   }
 
-  async uploadToS3() {
+  async uploadToS3(blobData: Blob) {
 
     let response = await axios.post('https://ri3eoiwlti.execute-api.us-east-1.amazonaws.com/dev/file', {
       key: new Date().getTime().toString().concat('.png'),
@@ -75,15 +141,16 @@ export class HomeComponent implements OnInit {
 
     let resBody = JSON.parse(response.data.body)
 
-    console.log(resBody)
+    console.log("Blob", blobData)
 
+    /*
     let binary = atob(this.captures[0].split(',')[1])
     let array = []
     for (var i = 0; i < binary.length; i++) {
       array.push(binary.charCodeAt(i))
     }
     let blobData = new Blob([new Uint8Array(array)], {type: 'image/png'})
-    console.log('Uploading to: ', resBody.uploadURL)
+    console.log('Uploading to: ', resBody.uploadURL)*/
 
     const result = await fetch(resBody.uploadURL, {
       method: 'PUT',
@@ -91,6 +158,34 @@ export class HomeComponent implements OnInit {
     })
     console.log('Result: ', result)
 
+    return resBody.objectUrlAfterUpload
+  }
+
+  async analyze() {
+    if (this.captures.length == 2) {
+      let binary = atob(this.captures[0].split(',')[1])
+      let array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      let blobData1 = new Blob([new Uint8Array(array)], {type: 'image/png'})
+      
+      binary = atob(this.captures[1].split(',')[1])
+      array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      let blobData2 = new Blob([new Uint8Array(array)], {type: 'image/png'})
+
+      /**
+       * SUBIDA A S3
+       */
+      await this.uploadToS3(blobData1)
+      await this.uploadToS3(blobData2)
+    }
+    else {
+      
+    }
   }
 
   removeCurrent() {
