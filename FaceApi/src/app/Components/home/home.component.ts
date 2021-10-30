@@ -181,8 +181,8 @@ export class HomeComponent implements OnInit {
       /**
        * SUBIDA A S3
        */
-      await this.uploadToS3(blobData1)
-      await this.uploadToS3(blobData2)
+      this.link1 = await this.uploadToS3(blobData1)
+      this.link2 = await this.uploadToS3(blobData2)
 
       let info1 = this.getInfo(this.link1)
       let info2 = this.getInfo(this.link2)
