@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
 
   link1: string;
   link2: string;
+  response: string[];
 
   WIDTH = 640;
   HEIGHT = 480;
@@ -34,9 +35,9 @@ export class HomeComponent implements OnInit {
 
   }
 
-  OnFileSelected1(event: any){
+  OnFileSelected1(event: any) {
     console.log(event)
-    const file:File = event.target.files[0];
+    const file: File = event.target.files[0];
 
     var reader = new FileReader();
     reader.readAsDataURL(file);
@@ -53,15 +54,15 @@ export class HomeComponent implements OnInit {
       for (var i = 0; i < binary.length; i++) {
         array.push(binary.charCodeAt(i))
       }
-      blobData1 = new Blob([new Uint8Array(array)], {type: 'image/png'})
-      
+      blobData1 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
       that.link1 = await that.uploadToS3(blobData1)
     };
   }
 
-  OnFileSelected2(event: any){
+  OnFileSelected2(event: any) {
     console.log(event)
-    const file:File = event.target.files[0];
+    const file: File = event.target.files[0];
 
     var reader = new FileReader();
     reader.readAsDataURL(file);
@@ -78,8 +79,8 @@ export class HomeComponent implements OnInit {
       for (var i = 0; i < binary.length; i++) {
         array.push(binary.charCodeAt(i))
       }
-      blobData1 = new Blob([new Uint8Array(array)], {type: 'image/png'})
-      
+      blobData1 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
       that.link2 = await that.uploadToS3(blobData1)
     };
   }
@@ -88,7 +89,7 @@ export class HomeComponent implements OnInit {
     await this.setupDevices();
   }
 
-  getBase64(file:File) {
+  getBase64(file: File) {
     var reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = function () {
@@ -98,7 +99,7 @@ export class HomeComponent implements OnInit {
     };
     reader.onerror = function (error) {
       console.log('Error: ', error);
-      
+
     };
   }
 
@@ -169,14 +170,14 @@ export class HomeComponent implements OnInit {
       for (var i = 0; i < binary.length; i++) {
         array.push(binary.charCodeAt(i))
       }
-      let blobData1 = new Blob([new Uint8Array(array)], {type: 'image/png'})
-      
+      let blobData1 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
       binary = atob(this.captures[1].split(',')[1])
       array = []
       for (var i = 0; i < binary.length; i++) {
         array.push(binary.charCodeAt(i))
       }
-      let blobData2 = new Blob([new Uint8Array(array)], {type: 'image/png'})
+      let blobData2 = new Blob([new Uint8Array(array)], { type: 'image/png' })
 
       /**
        * SUBIDA A S3
@@ -184,12 +185,15 @@ export class HomeComponent implements OnInit {
       this.link1 = await this.uploadToS3(blobData1)
       this.link2 = await this.uploadToS3(blobData2)
 
-      let info1 = this.getInfo(this.link1)
-      let info2 = this.getInfo(this.link2)
+      //let info1 = this.getInfo(this.link1, this.link2)  
+      //let info2 = this.getInfo(this.link2)  
+      this.getInfo(this.link1, this.link2)
+
     }
-    else if (this.link1 != null && this.link2 != null){
-      let info1 = this.getInfo(this.link1)
-      let info2 = this.getInfo(this.link2)
+    else if (this.link1 != null && this.link2 != null) {
+      //let info1 = this.getInfo(this.link1, this.link2)
+      //let info2 = this.getInfo(this.link2)
+      this.getInfo(this.link1, this.link2)
     }
     else {
       Swal.fire({
@@ -217,16 +221,52 @@ export class HomeComponent implements OnInit {
       .drawImage(image, 0, 0, this.WIDTH, this.HEIGHT);
   }
 
-  constructor(private data:AzureCognitiveServicesService){
+  constructor(private api: AzureCognitiveServicesService) {
     this.imageUrl = '';
     this.ImageInfo = '';
     this.captures = [];
   }
 
-  getInfo(imageUrl:string){
-    this.data.GetImage(imageUrl).subscribe(data => {
-      console.log(data)
-      return data;
+  getInfo(imageUrl: string, imageUrl2: string) {
+    this.api.detect(imageUrl, imageUrl2).subscribe({
+      next: data => {
+        this.response = data;
+        this.api.verify(data[0], data[1]).subscribe(result => {
+          var porcentaje = this.round(result.confidence * 100);
+          console.log(porcentaje);
+
+          let parentesco = this.parentesco(porcentaje);
+          Swal.fire({
+            title: `Similitud de ${porcentaje} %`,
+            text: `El parentesco entre las personas es: ${parentesco}`,
+            icon: 'info',
+            confirmButtonText: 'Cool'
+          })
+        })
+      }
     })
+  }
+
+  parentesco(porcentaje: number): string {
+    if (porcentaje >= 0 && porcentaje <= 20) {
+      return 'Ninguno'
+    } else if (porcentaje >= 21 && porcentaje <= 40) {
+      return 'Primos lejanos'
+    } else if (porcentaje >= 41 && porcentaje <= 60) {
+      return 'Primos o tíos'
+    } else if (porcentaje >= 61 && porcentaje <= 80) {
+      return 'Hermanos'
+    } else if (porcentaje >= 81 && porcentaje <= 90) {
+      return 'Papá - Mamá'
+    } else if (porcentaje >= 91 && porcentaje <= 100) {
+      return 'La misma persona'
+    } else {
+      return "Error"
+    }
+  }
+
+  round(num: number) {
+    var m = Number((Math.abs(num) * 100).toPrecision(15));
+    return Math.round(m) / 100 * Math.sign(num);
   }
 }
