@@ -40,9 +40,7 @@ export class LoginComponent implements OnInit {
 
   login() {
 
-    this.router.navigate(['./home']);
-
-    /*var aux = this.form_login.value as User;
+    var aux = this.form_login.value as User;
     this.user = aux;
     this.authService.signIn(this.form_login.value).subscribe((res) => {
       //console.log(res)
@@ -58,7 +56,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['./login']);
       }
 
-    });*/
+    });
   }
 
   ngOnInit(): void {

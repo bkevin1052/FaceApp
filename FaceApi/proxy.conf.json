@@ -1,0 +1,7 @@
+{
+  "/api/*": {
+    "target": "https://faceapuazure.herokuapp.com",
+    "secure": false,
+    "logLevel": "debug"
+  }
+}

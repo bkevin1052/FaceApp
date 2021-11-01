@@ -1,6 +1,11 @@
 <div class="bg"></div>
 <div class="bg bg2"></div>
 <div class="bg bg3"></div>
+<ul class="list-unstyled">
+  <li *ngFor="let src of captures; let idx = index" (click)="setPhoto(idx)">
+    <img [src]="src" height="50" />
+  </li>
+</ul>
 <div class="card content" style="width: 80%; height: 80%; margin-left: auto; margin-right: auto">
   <div class="card-body" >
      <h1> Face App</h1>
@@ -22,9 +27,3 @@
     <button class="btn btn-success" style="margin:20px;">Analyze Photo</button>
 
   </div>
-
-      <ul class="list-unstyled">
-        <li *ngFor="let src of captures; let idx = index" (click)="setPhoto(idx)">
-          <img [src]="src" height="50" />
-        </li>
-      </ul>

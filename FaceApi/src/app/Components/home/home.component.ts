@@ -98,7 +98,7 @@ export class HomeComponent implements OnInit {
   }
 
   setPhoto(idx: number) {
-    this.isCaptured = true;
+    //this.isCaptured = true;
     var image = new Image();
     image.src = this.captures[idx];
     this.drawImageToCanvas(image);

@@ -1,8 +1,8 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +11,15 @@ export class UpdatePassword {
 
   constructor(private httpClient: HttpClient) { }
 
+
   ActualizarPassword(formulario: any): Observable<any> {
-    return this.httpClient.post(`${environment.server}/api/updatePassword`,formulario).pipe(catchError(this.clientError));
+    const headers = new HttpHeaders()
+      .append('Content-Type', 'application/json')
+      .append('Access-Control-Allow-Headers', 'Content-Type')
+      .append('Access-Control-Allow-Methods', 'GET')
+      .append('Access-Control-Allow-Origin', '*');
+
+    return this.httpClient.post(`${environment.login}/api/updatePassword`,formulario,{headers}).pipe(catchError(this.clientError));
   }
 
   clientError(error: HttpErrorResponse) {

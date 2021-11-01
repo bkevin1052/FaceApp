@@ -6,7 +6,7 @@ import { JwtResponse } from '../../models/jwt-response';
 import { tap } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router'
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.prod';
 import jwt_decode from "jwt-decode";
 import { SocialAuthService, SocialUser } from 'angularx-social-login';
 
@@ -22,7 +22,7 @@ export class AuthService {
   authSubject = new BehaviorSubject(false);
 
   signIn(user: User): Observable<JwtResponse> {
-    return this.httpClient.post(`${environment.server}/api/login`, user).pipe(
+    return this.httpClient.post(`${environment.login}/api/login`, user).pipe(
 
       tap(async (res: any) => {
         if (res) {
@@ -39,7 +39,7 @@ export class AuthService {
   }
 
   signInGoogle(user: SocialUser): Observable<JwtResponse>{
-    return this.httpClient.post(`${environment.server}/api/loginGoogle`, user).pipe(
+    return this.httpClient.post(`${environment.login}/api/loginGoogle`, user).pipe(
 
       tap(async (res: any) => {
         if (res) {
