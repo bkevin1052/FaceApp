@@ -2,6 +2,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import axios from 'axios';
 import { AzureCognitiveServicesService } from '../services/AzureApi/azure-cognitive-services.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -11,8 +12,11 @@ import { AzureCognitiveServicesService } from '../services/AzureApi/azure-cognit
 export class HomeComponent implements OnInit {
 
   imageUrl: string;
-
   ImageInfo: string;
+
+  link1: string;
+  link2: string;
+  response: string[];
 
   WIDTH = 640;
   HEIGHT = 480;
@@ -31,12 +35,72 @@ export class HomeComponent implements OnInit {
 
   }
 
-  OnFileSelected(event: any){
+  OnFileSelected1(event: any) {
     console.log(event)
+    const file: File = event.target.files[0];
+
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    let blobData1 = new Blob()
+
+    let that = this;
+
+    reader.onload = async function () {
+      let fileData = reader.result?.toString()
+
+      let binary = atob(fileData!.split(',')[1])
+      let array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      blobData1 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
+      that.link1 = await that.uploadToS3(blobData1)
+    };
+  }
+
+  OnFileSelected2(event: any) {
+    console.log(event)
+    const file: File = event.target.files[0];
+
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    let blobData1 = new Blob()
+
+    let that = this;
+
+    reader.onload = async function () {
+      let fileData = reader.result?.toString()
+
+      let binary = atob(fileData!.split(',')[1])
+      let array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      blobData1 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
+      that.link2 = await that.uploadToS3(blobData1)
+    };
   }
 
   async ngAfterViewInit() {
     await this.setupDevices();
+  }
+
+  getBase64(file: File) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      console.log(reader.result)
+      return reader.result
+
+    };
+    reader.onerror = function (error) {
+      console.log('Error: ', error);
+
+    };
   }
 
   async setupDevices() {
@@ -63,10 +127,14 @@ export class HomeComponent implements OnInit {
     this.captures.push(this.canvas.nativeElement.toDataURL("image/png"));
     this.isCaptured = true;
 
-    this.uploadToS3()
+    if (this.captures.length > 2) {
+      this.captures.shift()
+    }
+
+    console.log(this.captures);
   }
 
-  async uploadToS3() {
+  async uploadToS3(blobData: Blob) {
 
     let response = await axios.post('https://ri3eoiwlti.execute-api.us-east-1.amazonaws.com/dev/file', {
       key: new Date().getTime().toString().concat('.png'),
@@ -75,15 +143,16 @@ export class HomeComponent implements OnInit {
 
     let resBody = JSON.parse(response.data.body)
 
-    console.log(resBody)
+    console.log("Blob", blobData)
 
+    /*
     let binary = atob(this.captures[0].split(',')[1])
     let array = []
     for (var i = 0; i < binary.length; i++) {
       array.push(binary.charCodeAt(i))
     }
     let blobData = new Blob([new Uint8Array(array)], {type: 'image/png'})
-    console.log('Uploading to: ', resBody.uploadURL)
+    console.log('Uploading to: ', resBody.uploadURL)*/
 
     const result = await fetch(resBody.uploadURL, {
       method: 'PUT',
@@ -91,6 +160,48 @@ export class HomeComponent implements OnInit {
     })
     console.log('Result: ', result)
 
+    return resBody.objectUrlAfterUpload
+  }
+
+  async analyze() {
+    if (this.captures.length == 2) {
+      let binary = atob(this.captures[0].split(',')[1])
+      let array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      let blobData1 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
+      binary = atob(this.captures[1].split(',')[1])
+      array = []
+      for (var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i))
+      }
+      let blobData2 = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
+      /**
+       * SUBIDA A S3
+       */
+      this.link1 = await this.uploadToS3(blobData1)
+      this.link2 = await this.uploadToS3(blobData2)
+
+      //let info1 = this.getInfo(this.link1, this.link2)  
+      //let info2 = this.getInfo(this.link2)  
+      this.getInfo(this.link1, this.link2)
+
+    }
+    else if (this.link1 != null && this.link2 != null) {
+      //let info1 = this.getInfo(this.link1, this.link2)
+      //let info2 = this.getInfo(this.link2)
+      this.getInfo(this.link1, this.link2)
+    }
+    else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Debes seleccionar dos imágenes o tomar dos fotografías!',
+      })
+    }
   }
 
   removeCurrent() {
@@ -110,18 +221,52 @@ export class HomeComponent implements OnInit {
       .drawImage(image, 0, 0, this.WIDTH, this.HEIGHT);
   }
 
-  constructor(private data:AzureCognitiveServicesService){
+  constructor(private api: AzureCognitiveServicesService) {
     this.imageUrl = '';
     this.ImageInfo = '';
     this.captures = [];
   }
 
-  getInfo(imageUrl:string){
-      this.data.GetImage(imageUrl).subscribe(data => {
-        console.log(data)
-        this.ImageInfo = data;
-      })
+  getInfo(imageUrl: string, imageUrl2: string) {
+    this.api.detect(imageUrl, imageUrl2).subscribe({
+      next: data => {
+        this.response = data;
+        this.api.verify(data[0], data[1]).subscribe(result => {
+          var porcentaje = this.round(result.confidence * 100);
+          console.log(porcentaje);
+
+          let parentesco = this.parentesco(porcentaje);
+          Swal.fire({
+            title: `Similitud de ${porcentaje} %`,
+            text: `El parentesco entre las personas es: ${parentesco}`,
+            icon: 'info',
+            confirmButtonText: 'Cool'
+          })
+        })
+      }
+    })
   }
 
+  parentesco(porcentaje: number): string {
+    if (porcentaje >= 0 && porcentaje <= 20) {
+      return 'Ninguno'
+    } else if (porcentaje >= 21 && porcentaje <= 40) {
+      return 'Primos lejanos'
+    } else if (porcentaje >= 41 && porcentaje <= 60) {
+      return 'Primos o tíos'
+    } else if (porcentaje >= 61 && porcentaje <= 80) {
+      return 'Hermanos'
+    } else if (porcentaje >= 81 && porcentaje <= 90) {
+      return 'Papá - Mamá'
+    } else if (porcentaje >= 91 && porcentaje <= 100) {
+      return 'La misma persona'
+    } else {
+      return "Error"
+    }
+  }
 
+  round(num: number) {
+    var m = Number((Math.abs(num) * 100).toPrecision(15));
+    return Math.round(m) / 100 * Math.sign(num);
+  }
 }
